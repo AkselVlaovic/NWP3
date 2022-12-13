@@ -4,21 +4,20 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import rs.raf.demo.requests.LoginRequest;
 import rs.raf.demo.responses.LoginResponse;
 import rs.raf.demo.services.UserService;
 import rs.raf.demo.utils.JwtUtil;
-//import rs.edu.raf.spring_project.model.AuthReq;
-//import rs.edu.raf.spring_project.model.AuthRes;
 
-@RestController
 @CrossOrigin
-@RequestMapping("/auth")
+@RestController
+@RequestMapping("/login")
 public class AuthController {
 
-    private final AuthenticationManager authenticationManager;
+    private AuthenticationManager authenticationManager;
     private final UserService userService;
     private final JwtUtil jwtUtil;
 
@@ -28,18 +27,18 @@ public class AuthController {
         this.jwtUtil = jwtUtil;
     }
 
-    @PostMapping("/login")
+    @PostMapping()
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest){
+
         try {
-            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
-        } catch (Exception   e){
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
+        } catch (Exception  e){
             e.printStackTrace();
             return ResponseEntity.status(401).build();
         }
 
-        UserDetails userDetails = userService.loadUserByUsername(loginRequest.getUsername());
-
-        return ResponseEntity.ok(new LoginResponse(jwtUtil.generateToken(userDetails)));
+        return ResponseEntity.ok(new LoginResponse(jwtUtil.generateToken(loginRequest.getEmail())));
     }
+
 
 }

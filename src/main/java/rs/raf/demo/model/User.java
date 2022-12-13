@@ -1,21 +1,39 @@
 package rs.raf.demo.model;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 import javax.persistence.*;
 
 @Entity
-@Getter
-@Setter
+@Data
 public class User {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long userId;
+    private Long id;
 
-    @Column
-    private String username;
+    @Column(nullable = false)
+    private String name;
 
-    @Column
+    @Column(nullable = false)
+    private String surname;
+
+    @Column(nullable = false, unique = true)
+    private String email;
+
+    @Column(nullable = false)
     private String password;
+
+    @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "can_create_users", column = @Column(name = "can_create_users")),
+            @AttributeOverride(name = "can_read_users", column = @Column(name = "can_read_users")),
+            @AttributeOverride(name = "can_update_users", column = @Column(name = "can_update_users")),
+            @AttributeOverride(name = "can_delete_users", column = @Column(name = "can_delete_users"))
+    })
+    private Roles roles = new Roles();
+
+
+
+
 }
